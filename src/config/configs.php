@@ -1,5 +1,8 @@
 <?php
 
+if(!defined('APP_ACCESS'))
+	exit('Access denied!');
+
 $config = [];
 
 $config['ServiceContainer']['Controllers'] = [

@@ -4,6 +4,8 @@ namespace App\Controllers;
 
 use Controllers\IndexController;
 
+if(!defined('APP_ACCESS'))
+	exit('Access denied!');
 
 class MainController extends IndexController
 {
