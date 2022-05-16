@@ -1,2 +1,72 @@
-DirectoryIndex index.htm index.php
-RewriteEngine on
+Options All -Indexes +ExecCGI +Includes +FollowSymLinks
+
+AddDefaultCharset UTF-8
+
+DirectoryIndex index.htm index.html index.php
+
+<IfModule mod_setenvif.c>
+	SetEnv TZ Russia/Voronezh
+</IfModule>
+
+ServerSignature Off
+
+AddType application/javascript .js
+AddType text/css .css
+
+AddType audio/ogg   .ogg
+AddType audio/mpeg  .mp3
+AddType audio/x-wav .wav
+
+AddType text/csv .csv
+
+ExpiresActive On
+ExpiresDefault "access plus 43200 seconds"
+
+<IfModule mod_deflate.c>
+	AddOutputFilterByType DEFLATE text/html text/plain text/xml application/xml application/xhtml+xml text/css text/javascript application/javascript
+</IfModule>
+
+<IfModule mod_rewrite.c>
+	RewriteEngine On
+	RewriteBase /
+       
+    RewriteCond %{REQUEST_URI} !\?
+    RewriteCond %{REQUEST_URI} !\&
+    RewriteCond %{REQUEST_URI} !\=
+    RewriteCond %{REQUEST_URI} !\.
+    RewriteCond %{REQUEST_URI} !\/$
+    RewriteRule ^(.*[^\/])$ /$1/ [R=301,L]
+    
+    RewriteRule ^(.*)/index\.php(.*) http://%{HTTP_HOST}/$1$2 [R=301,L]
+    RewriteRule ^(.*)/index\.html(.*) http://%{HTTP_HOST}/$1$2 [R=301,L]
+    RewriteRule ^(.*)/index\.(html|php)$ http://%{HTTP_HOST}/$1 [R=301,L]
+    
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php/$1 [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+    <FilesMatch "\.(html|htm|xml|txt)$">
+        Header set Cache-Control "max-age=172800"
+    </FilesMatch>
+   
+    <FilesMatch "\.(js|css)$">
+        Header set Cache-Control "max-age=172800"
+    </FilesMatch>
+    
+    <FilesMatch "\.(gif|jpg|jpeg|png|flv|swf|ico)$">
+        Header set Cache-Control "max-age=43200"
+    </FilesMatch>
+
+    <FilesMatch "\.(csv|xls|pdf|wav|mp3|ogg)$">
+       ExpiresDefault "access plus 43200 seconds"
+       Header append Cache-Control "public, must-revalidate"
+       SetEnvIfNoCase Request_URI \.(?:wav|mp3|ogg)$ no-gzip dont-vary
+       SetEnvIfNoCase Request_URI \.(?:pdf)$ no-gzip dont-vary
+    </FilesMatch>
+
+    <FilesMatch "\.(php)$">
+        Header unset Cache-Control
+    </FilesMatch>        
+</IfModule>
